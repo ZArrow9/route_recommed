@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公車路線推薦系統</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #007bff;
+        }
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-weight: bold;
+        }
+        select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: #ffffff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startSelect = document.getElementById('start');
+            const endSelect = document.getElementById('end');
+            const submitButton = document.getElementById('submitBtn');
+        
+            submitButton.disabled = true;
+            submitButton.style.backgroundColor = '#d3d3d3'; // 设置灰色背景色
+            
+            startSelect.addEventListener('change', checkSelection);
+            endSelect.addEventListener('change', checkSelection);
+        
+            function checkSelection() {
+                if (startSelect.value !== '' && endSelect.value !== '') {
+                    submitButton.disabled = false;
+                    submitButton.style.backgroundColor = '#007bff'; // 恢复蓝色背景色
+                }
+                else {
+                    submitButton.disabled = true;
+                    submitButton.style.backgroundColor = '#d3d3d3'; // 设置灰色背景色
+                }
+            }
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const startValue = startSelect.value.trim(); // 获取起点值并去除首尾空格
+                const endValue = endSelect.value.trim(); // 获取终点值并去除首尾空格
+
+               
+                 if (startValue === endValue) {
+                    // 如果起点和终点相同，显示提示信息并清空选择
+                    alert('起點和終點不能相同，請重新選擇。');
+                    startSelect.value = '';
+                    endSelect.value = '';
+                    submitButton.disabled = true; // 禁用提交按钮
+                    submitButton.style.backgroundColor = '#d3d3d3'; // 设置灰色背景色
+                } else {
+                    // 如果起点和终点都有值且不相同，则提交表单（这里仅示例，实际应用需根据需求修改）
+                    form.submit();
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>公車路線推薦系統</h1>
+    <form action="/submit/" method="post">
+        <label for="start">輸入起點站牌:</label>
+        <select id="start" name="start">
+            <option value="" selected disabled>請選擇起點站牌</option>
+            {% for number in range(1, 101) %}
+                <option value="{{ number }}">{{ number }}</option>
+            {% endfor %}
+        </select><br>
+        <label for="end">輸入終點站牌:</label>
+        <select id="end" name="end">
+            <option value="" selected disabled>請選擇終點站牌</option>
+            {% for number in range(1, 101) %}
+                <option value="{{ number }}">{{ number }}</option>
+            {% endfor %}
+        </select><br>
+
+        <button type="submit" id="submitBtn">Submit</button>
+    </form>
+</body>
+</html>
