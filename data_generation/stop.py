@@ -1,29 +1,30 @@
 import csv
 import random
 
-# 創建空的矩陣
 matrix = []
-
-# 生成 100 列
 for _ in range(100):
-    # 隨機生成每列的公車數量（5 到 10 輛）
-    bus_amount = random.randint(5, 10)
-    # 創建一列，元素初始化為 0
-    row = [0] * bus_amount
-    
-    # 生成不重複的隨機數填入列中
-    for i in range(bus_amount):
-        new_number = random.randint(1, 100)
-        while new_number in row:
-            new_number = random.randint(1, 100)
-        row[i] = new_number
-    
-    # 將這一列加入矩陣中
+    row = [0] * 100
     matrix.append(row)
 
-# 將矩陣資料寫入 CSV 檔案
-csv_file_path = 'bus.csv'
-with open(csv_file_path, 'w', newline='') as csvfile:
+# 設定 b1 和 b2 之間的距離
+matrix[0][1] = 1
+
+# 填充矩陣中的時間值
+for row in range(len(matrix)):
+    for col in range(len(matrix)):
+        if (row == 0) and (col > 1):
+            # 從 b1 到其他站點的時間
+            matrix[row][col] = matrix[row][col - 1] + random.randint(1, 3)
+        elif row != 0:
+            if row > col:
+                # 使用對稱性填充現有值
+                matrix[row][col] = matrix[col][row]
+            elif row < col:
+                # 基於前一列計算時間
+                matrix[row][col] = (matrix[row - 1][col] - matrix[row - 1][row])
+
+# 將矩陣數據寫入 CSV 檔案
+with open('stop.csv', 'w', newline='') as csvfile:
     writer = csv.writer(csvfile)
     for row in matrix:
         writer.writerow(row)

@@ -121,8 +121,3 @@ def data_processing(shortest_path):
     return bus,new_shortest_path
 
 bus_data, stop_data = load_data_from_csv()
-
-"""bus_number,new_shortpath,time=find_shortest_path(56,88)
-for b,n in zip(bus_number, new_shortpath):
-    print(str(b)+":"+str(n))
-print("所花時間:"+str(time))"""

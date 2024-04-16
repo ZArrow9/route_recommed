@@ -1,7 +1,7 @@
 import csv
 import random
 
-# 創建空的矩陣
+#建立空的矩陣
 matrix = []
 
 # 生成 100 列
