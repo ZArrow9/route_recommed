@@ -1,0 +1,134 @@
+<!-- test.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Path Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        p {
+            text-align: center; /* 文本居中 */
+            font-size: 18px; /* 字体大小 */
+            font-weight: bold; /* 加粗 */
+            margin-top: 10px; /* 上方间距 */
+        }
+        .container {
+            flex-grow: 1;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 100%; /* 让表格宽度占满父容器 */
+            max-width: 600px; /* 设置表格最大宽度 */
+            margin: 0 auto; /* 水平居中 */
+            margin-top: 20px;
+            text-align: center; /* 让表格内容居中 */
+        }
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .spacer {
+            flex-grow: 4;
+        }
+        .btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        #pagination {
+            text-align: center; /* 文本居中 */
+            margin-top: 20px; /* 上方间距 */
+        }
+    </style>
+    
+</head>
+<body>
+    <h1>路線規劃結果</h1>
+    <p>起點: {{ start }} 終點: {{ end }} </p>
+    
+    <div id="tableContainer"></div>
+    <div id="pagination"></div>
+
+    <script>
+        var data = {{ data | tojson }};
+        var pageSize = 10; // 每页显示的行数
+        var currentPage = 1; // 当前页数
+
+        function generateTable(page) {
+            var startIndex = (page - 1) * pageSize;
+            var endIndex = Math.min(startIndex + pageSize, data.length);
+            var tableHtml = "<table border='1'><tr><th>轉車次數</th><th>所花時間</th><th>車資</th><th>詳細資料</th></tr>";
+            for (var i = startIndex; i < endIndex; i++) {
+                var totalTime = data[i][1];
+                var minutes = Math.floor(totalTime / 60);
+                var seconds = totalTime % 60;
+                var timeString = minutes + " 分 " + seconds + " 秒";
+                var cost = data[i][2] + "元";
+                var formHtml = "<form action='/result/' method='post'>" +
+                    "<input type='hidden' name='index' value='" + i + "'>" +
+                    "<button type='submit' class='btn'>選擇此路線</button>" +
+                    "</form>";
+                tableHtml += "<tr><td>" + data[i][0] + "</td><td>" + timeString + "</td><td>" + cost + "</td><td>" + 
+                formHtml + "</td></tr>";
+            }
+            tableHtml += "</table>";
+            document.getElementById("tableContainer").innerHTML = tableHtml;
+        }
+
+        function generatePagination() {
+            var totalPages = Math.ceil(data.length / pageSize);
+            var paginationHtml = "第 " + currentPage + " 頁 / 共 " + totalPages + " 頁 ";
+            if (currentPage > 1) {
+                paginationHtml += "<a href='#' onclick='changePage(" + (currentPage - 1) + ")'>上一頁</a> ";
+            }
+            if (currentPage < totalPages) {
+                paginationHtml += "<a href='#' onclick='changePage(" + (currentPage + 1) + ")'>下一頁</a>";
+            }
+            document.getElementById("pagination").innerHTML = paginationHtml;
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            generateTable(currentPage);
+            generatePagination();
+        }
+
+        generateTable(currentPage);
+        generatePagination();
+    </script>
+    <form action="/" method="get" style="text-align: center; margin-top: 20px;">
+        <button type="submit" id="submitBtn" class="btn">再次查詢</button>
+    </form>
+</body>
+</html>

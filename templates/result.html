@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>路線規劃結果</title>
+    <title>公車路線查詢</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -38,39 +38,63 @@
             background-color: #fff;
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            display: flex; /* Use flexbox for alignment */
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically */
-            text-align: center; /* Center text within the li */
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+        }
+        form {
+            display: flex;
+            justify-content: center; 
+        }
+        button {
+            background-color: #007bff; 
+            color: #fff; 
+            border: none; 
+            border-radius: 4px; 
+            padding: 12px 20px; 
+            font-size: 18px; 
+            cursor: pointer; 
+            transition: background-color 0.3s ease; 
+        }
+        
+        button:hover {
+            background-color: #0056b3; 
         }
     </style>
 </head>
 <body>
     <div>
-        <h1>路線規劃結果</h1>
-        <h2>以下是 {{ start }} 號站牌至 {{ end }} 號站牌的路線規劃</h2>
+        <h1>公車路線資料</h1>
 
         {% if shortest_path %}
-    <ul>
-        {% set first_bus = true %}
-        {% for bus_info in bus %}
-            {% if loop.index0 == 0 %}
-                <li>搭乘 {{ bus_info }} 號公車：{{ shortest_path[loop.index0] | join(' → ') }}</li>
-            {% else %}
-                {% if first_bus %}
-                    <li>轉乘 {{ bus_info }} 號公車：{{ shortest_path[loop.index0] | join(' → ') }}</li>
-                    {% set first_bus = false %}
-                {% else %}
-                    <li>再轉乘 {{ bus_info }} 號公車：{{ shortest_path[loop.index0] | join(' → ') }}</li>
-                {% endif %}
-            {% endif %}
-        {% endfor %}
-    </ul>
-{% endif %}
+            <ul>
+                {% set first_bus = true %}
+                {% for bus_info in bus %}
+                    {% if loop.index0 == 0 %}
+                        <li>乘坐 {{ bus_info }} 號公車: {{ shortest_path[loop.index0] | join(' → ') }}</li>
+                    {% else %}
+                        {% if first_bus %}
+                            <li>轉乘 {{ bus_info }} 號公車: {{ shortest_path[loop.index0] | join(' → ') }}</li>
+                            {% set first_bus = false %}
+                        {% else %}
+                            <li>再轉乘 {{ bus_info }} 號公車: {{ shortest_path[loop.index0] | join(' → ')  }} </li>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% endif %}
 
         {% if time %}
-        <h3>所花時間：{{ time }} 分鐘</h3>
-        {% endif %}
+            {% set minutes = time // 60 %}
+            {% set seconds = time % 60 %}
+        <h3>所花時間: {{ minutes }} 分 {{ seconds }} 秒</h3>
+{% endif %}
     </div>
+
+    <form action="/" method="get">
+        <button type="submit" id="submitBtn">再次規劃路線</button>
+    </form>
+
 </body>
 </html>

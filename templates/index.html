@@ -11,9 +11,11 @@
             padding: 20px;
             text-align: center;
         }
+        
         h1 {
             color: #007bff;
         }
+        
         form {
             max-width: 400px;
             margin: 0 auto;
@@ -22,9 +24,11 @@
             border-radius: 8px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
+        
         label {
             font-weight: bold;
         }
+        
         select, button {
             width: 100%;
             padding: 10px;
@@ -34,14 +38,20 @@
             box-sizing: border-box;
             font-size: 16px;
         }
+        
         button {
             background-color: #007bff;
             color: #ffffff;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
+        
         button:hover {
             background-color: #0056b3;
+        }
+
+        button:disabled {
+            background-color: #d3d3d3;
         }
     </style>
     <script>
@@ -49,65 +59,84 @@
             const startSelect = document.getElementById('start');
             const endSelect = document.getElementById('end');
             const submitButton = document.getElementById('submitBtn');
+            const options = document.querySelectorAll('input[name="options"]');
         
             submitButton.disabled = true;
-            submitButton.style.backgroundColor = '#d3d3d3'; // 设置灰色背景色
             
             startSelect.addEventListener('change', checkSelection);
             endSelect.addEventListener('change', checkSelection);
+            options.forEach(option => option.addEventListener('change', checkSelection));
         
             function checkSelection() {
-                if (startSelect.value !== '' && endSelect.value !== '') {
+                const optionSelected = Array.from(options).some(option => option.checked);
+                if (startSelect.value !== '' && endSelect.value !== '' && optionSelected) {
                     submitButton.disabled = false;
-                    submitButton.style.backgroundColor = '#007bff'; // 恢复蓝色背景色
-                }
-                else {
+                    submitButton.classList.add('btn-enabled');
+                    submitButton.classList.remove('btn');
+                } else {
                     submitButton.disabled = true;
-                    submitButton.style.backgroundColor = '#d3d3d3'; // 设置灰色背景色
+                    submitButton.classList.remove('btn-enabled');
+                    submitButton.classList.add('btn');
                 }
             }
+
             const form = document.querySelector('form');
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
 
-                const startValue = startSelect.value.trim(); // 获取起点值并去除首尾空格
-                const endValue = endSelect.value.trim(); // 获取终点值并去除首尾空格
+                const startValue = startSelect.value.trim();
+                const endValue = endSelect.value.trim();
+                const optionSelected = Array.from(options).some(option => option.checked);
 
-               
-                 if (startValue === endValue) {
-                    // 如果起点和终点相同，显示提示信息并清空选择
+                if (startValue === endValue) {
                     alert('起點和終點不能相同，請重新選擇。');
                     startSelect.value = '';
                     endSelect.value = '';
-                    submitButton.disabled = true; // 禁用提交按钮
-                    submitButton.style.backgroundColor = '#d3d3d3'; // 设置灰色背景色
+                    submitButton.disabled = true;
+                    submitButton.classList.remove('btn-enabled');
+                    submitButton.classList.add('btn');
+                } else if (!optionSelected) {
+                    alert('請選擇一個額外選項。');
                 } else {
-                    // 如果起点和终点都有值且不相同，则提交表单（这里仅示例，实际应用需根据需求修改）
                     form.submit();
                 }
             });
+
+            startSelect.value = '';
+            endSelect.value = '';
+            submitButton.disabled = true;
         });
     </script>
 </head>
 <body>
     <h1>公車路線推薦系統</h1>
     <form action="/submit/" method="post">
-        <label for="start">輸入起點站牌:</label>
+        <label for="start">輸入起點站牌</label>
         <select id="start" name="start">
             <option value="" selected disabled>請選擇起點站牌</option>
             {% for number in range(1, 101) %}
                 <option value="{{ number }}">{{ number }}</option>
             {% endfor %}
         </select><br>
-        <label for="end">輸入終點站牌:</label>
+        <label for="end">輸入終點站牌</label>
         <select id="end" name="end">
             <option value="" selected disabled>請選擇終點站牌</option>
             {% for number in range(1, 101) %}
                 <option value="{{ number }}">{{ number }}</option>
             {% endfor %}
         </select><br>
-
-        <button type="submit" id="submitBtn">Submit</button>
+        <fieldset>
+            <legend>選擇額外選項</legend>
+            <input type="radio" id="min_transfers" name="options" value="min_transfers">
+            <label for="min_transfers">轉車次數最少</label><br>
+    
+            <input type="radio" id="shortest_time" name="options" value="shortest_time">
+            <label for="shortest_time">最短時間</label><br>
+    
+            <input type="radio" id="lowest_cost" name="options" value="lowest_cost">
+            <label for="lowest_cost">最短花費</label><br>
+        </fieldset>
+        <button type="submit" id="submitBtn">查詢</button>
     </form>
 </body>
 </html>
